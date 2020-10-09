@@ -8,7 +8,5 @@ export const findIndexOfFirstDeviation = (buffer1, buffer2, skip) => {
     idx++
   }
 
-  console.log(idx, buffer1.length, buffer2.length)
-
   return idx >= Math.max(buffer1.length, buffer2.length) ? -1 : idx
 }
