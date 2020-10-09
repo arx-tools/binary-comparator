@@ -52,11 +52,11 @@ const args = minimist(process.argv.slice(2), {
   const file1 = await fs.promises.readFile(filename1)
   const file2 = await fs.promises.readFile(filename2)
 
-  console.log(EOL + 'size:')
+  console.log(EOL + 'length:')
   if (file1.length === file2.length) {
-    console.log('  the two files match')
+    console.log(`  the two files match, both are ${toHexIfNeeded(file1.length)} bytes`)
   } else {
-    console.log(`  the two files differ: ${toHexIfNeeded(file1.length)} <> ${toHexIfNeeded(file2.length)}`)
+    console.log(`  the two files differ: ${toHexIfNeeded(file1.length)} bytes <> ${toHexIfNeeded(file2.length)} bytes`)
   }
 
   console.log(EOL + 'deviance:')
