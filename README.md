@@ -2,6 +2,10 @@
 
 Compares two binary files and tells some info on where they differ
 
+## installation
+
+`npm i -g binary-comparator`
+
 ## usage
 
 `bin-compare --version`
