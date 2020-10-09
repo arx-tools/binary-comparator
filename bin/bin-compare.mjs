@@ -6,9 +6,10 @@ import minimist from 'minimist'
 import { fileExists, getPackageVersion } from './helpers.mjs'
 import { toHex } from '../src/helpers.mjs'
 import { findIndexOfFirstDeviation } from '../src/index.mjs'
-import { when, has } from '../node_modules/ramda/src/index.mjs'
+import { when, has, clamp } from '../node_modules/ramda/src/index.mjs'
 
 const args = minimist(process.argv.slice(2), {
+  number: ['skip'],
   boolean: ['hex', 'version']
 });
 
@@ -43,6 +44,8 @@ const args = minimist(process.argv.slice(2), {
     hasErrors = true
   }
 
+  const skip = clamp(0, Infinity, args.skip || 0)
+
   if (hasErrors) {
     process.exit(1)
   }
@@ -61,7 +64,7 @@ const args = minimist(process.argv.slice(2), {
 
   console.log(EOL + 'deviance:')
 
-  const firstDeviationIdx = findIndexOfFirstDeviation(file1, file2)
+  const firstDeviationIdx = findIndexOfFirstDeviation(file1, file2, skip)
   if (firstDeviationIdx === -1) {
     console.log('  the two files match')
   } else {
