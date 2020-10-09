@@ -1,6 +1,6 @@
 {
   "name": "binary-comparator",
-  "version": "0.0.1",
+  "version": "0.0.2",
   "description": "Compares two binary files and tells some info on where they differ",
   "main": "src/index.mjs",
   "bin": {
