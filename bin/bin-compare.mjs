@@ -8,6 +8,47 @@ import { toHex } from '../src/helpers.mjs'
 import { findIndexOfFirstDeviation } from '../src/index.mjs'
 import { when, has, clamp, repeat } from '../node_modules/ramda/src/index.mjs'
 
+const stringifyBytes = bytes => {
+  let dump = Buffer.from(bytes).toString('hex')
+  if (dump.length > 2) {
+    dump = dump.match(/../g).join(' ')
+  }
+  return dump
+}
+
+const generateEllipsis = (firstDeviationIdx, file, bytes) => {
+  const preEllipsis = firstDeviationIdx >= 6 && has(firstDeviationIdx, file) && file.length >= firstDeviationIdx ? '..' : '  '
+  const postEllipsis = has(firstDeviationIdx, file) && file.length >= firstDeviationIdx + 7 ? '..' : '  '
+  return `${preEllipsis} ${stringifyBytes(bytes)} ${postEllipsis}`
+}
+
+const miniDump = (firstDeviationIdx, file1, file2) => {
+  let bytes1 = []
+  let bytes2 = []
+  let deviantByte1Idx = 0
+  let deviantByte2Idx = 0
+  const minus = firstDeviationIdx > 5 ? -5 : -firstDeviationIdx
+
+  for (let i = minus; i <= 5; i++) {
+    if (i === 0) {
+      deviantByte1Idx = bytes1.length
+      deviantByte2Idx = bytes2.length
+    }
+    const idx = firstDeviationIdx + i
+    if (has(idx, file1)) {
+      bytes1.push(file1[idx])
+    }
+    if (has(idx, file2)) {
+      bytes2.push(file2[idx])
+    }
+  }
+
+  console.log(`           ${repeat('   ', deviantByte1Idx + 1).join('')}vv`)
+  console.log(`     left: ${generateEllipsis(firstDeviationIdx, file1, bytes1)}`)
+  console.log(`    right: ${generateEllipsis(firstDeviationIdx, file2, bytes2)}`)
+  console.log(`           ${repeat('   ', deviantByte2Idx + 1).join('')}^^`)
+}
+
 const args = minimist(process.argv.slice(2), {
   number: ['skip'],
   boolean: ['hex', 'version']
@@ -74,38 +115,6 @@ const args = minimist(process.argv.slice(2), {
     const char2 = has(firstDeviationIdx, file2) ? toHexIfNeeded(file2[firstDeviationIdx]) : 'undefined'
     console.log(`  the two files differ at ${toHexIfNeeded(firstDeviationIdx)}: ${char1} <> ${char2}`)
 
-    let bytes1 = []
-    let bytes2 = []
-    let deviantByte1Idx = 0
-    let deviantByte2Idx = 0
-    const minus = firstDeviationIdx > 5 ? -5 : -firstDeviationIdx
-    for (let i = minus; i <= 5; i++) {
-      if (i === 0) {
-        deviantByte1Idx = bytes1.length
-        deviantByte2Idx = bytes2.length
-      }
-      if (has(firstDeviationIdx + i, file1)) {
-        bytes1.push(file1[firstDeviationIdx + i])
-      }
-      if (has(firstDeviationIdx + i, file2)) {
-        bytes2.push(file2[firstDeviationIdx + i])
-      }
-    }
-    bytes1 = Buffer.from(bytes1).toString('hex')
-    if (bytes1.length > 2) {
-      bytes1 = bytes1.match(/../g).join(' ')
-    }
-    bytes2 = Buffer.from(bytes2).toString('hex')
-    if (bytes2.length > 2) {
-      bytes2 = bytes2.match(/../g).join(' ')
-    }
-    const ellipsis1 = firstDeviationIdx >= 6 && has(firstDeviationIdx, file1) && file1.length >= firstDeviationIdx ? '..' : '  '
-    const ellipsis2 = firstDeviationIdx >= 6 && has(firstDeviationIdx, file2) && file2.length >= firstDeviationIdx ? '..' : '  '
-    const ellipsis3 = has(firstDeviationIdx, file1) && file1.length >= firstDeviationIdx + 7 ? '..' : '  '
-    const ellipsis4 = has(firstDeviationIdx, file2) && file2.length >= firstDeviationIdx + 7 ? '..' : '  '
-    console.log(`           ${repeat('   ', deviantByte1Idx + 1).join('')}vv`)
-    console.log(`     left: ${ellipsis1} ${bytes1} ${ellipsis3} `)
-    console.log(`    right: ${ellipsis2} ${bytes2} ${ellipsis4} `)
-    console.log(`           ${repeat('   ', deviantByte2Idx + 1).join('')}^^`)
+    miniDump(firstDeviationIdx, file1, file2)
   }
 })()
