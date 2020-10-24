@@ -60,11 +60,9 @@ const args = minimist(process.argv.slice(2), {
     process.exit(0)
   }
 
-  let filename1 = args._[0]
-  let filename2 = args._[1]
-
   let hasErrors = false
 
+  let filename1 = args._[0]
   if (filename1) {
     if (!await fileExists(filename1)) {
       console.error('error: first filename does not exist')
@@ -75,6 +73,7 @@ const args = minimist(process.argv.slice(2), {
     hasErrors = true
   }
 
+  let filename2 = args._[1]
   if (filename2) {
     if (!await fileExists(filename2)) {
       console.error('error: second filename does not exist')
