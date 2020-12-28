@@ -1,5 +1,7 @@
-import { has, repeat } from '../node_modules/ramda/src/index.mjs'
 import { EOL } from 'os'
+import R from 'ramda'
+
+const { has, repeat } = R
 
 const findIndexOfFirstDeviation = (buffer1, buffer2, skip) => {
   let idx = 0

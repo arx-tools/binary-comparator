@@ -4,7 +4,9 @@ import fs from 'fs'
 import minimist from 'minimist'
 import { fileExists, getPackageVersion } from './helpers.mjs'
 import binCompare, { report } from '../src/index.mjs'
-import { clamp } from '../node_modules/ramda/src/index.mjs'
+import R from 'ramda'
+
+const { clamp } = R
 
 const args = minimist(process.argv.slice(2), {
   number: ['skip'],
