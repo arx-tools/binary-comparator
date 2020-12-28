@@ -2,9 +2,9 @@
   "name": "binary-comparator",
   "version": "0.4.1",
   "description": "Compares two binary files and tells some info on where they differ",
-  "main": "src/index.mjs",
+  "main": "src/index.js",
   "bin": {
-    "bin-compare": "bin/bin-compare.mjs"
+    "bin-compare": "bin/bin-compare.js"
   },
   "scripts": {},
   "repository": {

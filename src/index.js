@@ -1,7 +1,5 @@
-import { EOL } from 'os'
-import R from 'ramda'
-
-const { has, repeat } = R
+const { EOL } = require('os')
+const { has, repeat } = require('ramda')
 
 const findIndexOfFirstDeviation = (buffer1, buffer2, skip) => {
   let idx = 0
@@ -28,7 +26,7 @@ const generateEllipsis = (firstDeviationIdx, file, bytes) => {
   return `${preEllipsis} ${stringifyBytes(bytes)} ${postEllipsis}`
 }
 
-export const miniDump = (firstDeviationIdx, file1, file2) => {
+const miniDump = (firstDeviationIdx, file1, file2) => {
   let bytes1 = []
   let bytes2 = []
   let deviantByte1Idx = 0
@@ -59,7 +57,7 @@ export const miniDump = (firstDeviationIdx, file1, file2) => {
   return lines.join(EOL)
 }
 
-export default (file1, file2, skip = 0) => {
+const compare = (file1, file2, skip = 0) => {
   const result = {
     size: {
       equals: true
@@ -94,7 +92,7 @@ const toHex = (n, padSize = 0, raw = false) => {
   return typeof n === 'number' ? ((raw ? '' : '0x') + n.toString(16).padStart(padSize, '0')) : n
 }
 
-export const report = (file1, file2, { size, deviation }, displayAsHex = false) => {
+const report = (file1, file2, { size, deviation }, displayAsHex = false) => {
   const toHexIfNeeded = (...params) => {
     return displayAsHex ? toHex(...params) : params[0]
   }
@@ -120,4 +118,10 @@ export const report = (file1, file2, { size, deviation }, displayAsHex = false) 
   }
 
   return lines.join(EOL)
+}
+
+module.exports = {
+  report,
+  miniDump,
+  compare
 }

@@ -1,12 +1,10 @@
-#!/usr/bin/env node --experimental-modules
+#!/usr/bin/env node
 
-import fs from 'fs'
-import minimist from 'minimist'
-import { fileExists, getPackageVersion } from './helpers.mjs'
-import binCompare, { report } from '../src/index.mjs'
-import R from 'ramda'
-
-const { clamp } = R
+const fs = require('fs')
+const minimist = require('minimist')
+const { fileExists, getPackageVersion } = require('./helpers.js')
+const { compare, report } = require('../src/index.js')
+const { clamp } = require('ramda')
 
 const args = minimist(process.argv.slice(2), {
   number: ['skip'],
@@ -15,7 +13,7 @@ const args = minimist(process.argv.slice(2), {
 
 (async () => {
   if (args.version) {
-    console.log(await getPackageVersion())
+    console.log(getPackageVersion())
     process.exit(0)
   }
 
@@ -52,5 +50,5 @@ const args = minimist(process.argv.slice(2), {
   const file1 = await fs.promises.readFile(filename1)
   const file2 = await fs.promises.readFile(filename2)
 
-  console.log(report(file1, file2, binCompare(file1, file2, skip), args.hex))
+  console.log(report(file1, file2, compare(file1, file2, skip), args.hex))
 })()
