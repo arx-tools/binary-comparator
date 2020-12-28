@@ -1,4 +1,5 @@
 import { has, repeat } from '../node_modules/ramda/src/index.mjs'
+import { EOL } from 'os'
 
 const findIndexOfFirstDeviation = (buffer1, buffer2, skip) => {
   let idx = 0
@@ -46,10 +47,14 @@ export const miniDump = (firstDeviationIdx, file1, file2) => {
     }
   }
 
-  console.log(`           ${repeat('   ', deviantByte1Idx + 1).join('')}vv`)
-  console.log(`     left: ${generateEllipsis(firstDeviationIdx, file1, bytes1)}`)
-  console.log(`    right: ${generateEllipsis(firstDeviationIdx, file2, bytes2)}`)
-  console.log(`           ${repeat('   ', deviantByte2Idx + 1).join('')}^^`)
+  const lines = [
+    `           ${repeat('   ', deviantByte1Idx + 1).join('')}vv`,
+    `     left: ${generateEllipsis(firstDeviationIdx, file1, bytes1)}`,
+    `    right: ${generateEllipsis(firstDeviationIdx, file2, bytes2)}`,
+    `           ${repeat('   ', deviantByte2Idx + 1).join('')}^^`
+  ]
+
+  return lines.join(EOL)
 }
 
 export default (file1, file2, skip = 0) => {
@@ -66,7 +71,7 @@ export default (file1, file2, skip = 0) => {
     result.size.equals = true
   } else {
     result.size.equals = false
-    result.size.sign = file2.length > file1.length ? '-' : '+'
+    result.size.sign = file2.length > file1.length ? '+' : '-'
     result.size.diff = Math.abs(file2.length - file1.length)
   }
 
@@ -83,3 +88,34 @@ export default (file1, file2, skip = 0) => {
   return result
 }
 
+const toHex = (n, padSize = 0, raw = false) => {
+  return typeof n === 'number' ? ((raw ? '' : '0x') + n.toString(16).padStart(padSize, '0')) : n
+}
+
+export const report = (file1, file2, { size, deviation }, displayAsHex = false) => {
+  const toHexIfNeeded = (...params) => {
+    return displayAsHex ? toHex(...params) : params[0]
+  }
+
+  const lines = []
+
+  lines.push(EOL + 'size:')
+  if (size.equals) {
+    lines.push(`  the two files match, both are ${toHexIfNeeded(file1.length)} bytes`)
+  } else {
+    const { sign, diff } = size
+    lines.push(`  the two files differ: ${toHexIfNeeded(file1.length)} bytes <> ${toHexIfNeeded(file2.length)} bytes (${sign}${toHexIfNeeded(diff)})`)
+  }
+
+  lines.push(EOL + 'deviance:')
+  if (deviation.equals) {
+    lines.push('  the two files match')
+  } else {
+    const { firstDeviationIdx, char1, char2 } = deviation
+    lines.push(`  the two files differ at ${toHexIfNeeded(firstDeviationIdx)}: ${toHexIfNeeded(char1, 2)} <> ${toHexIfNeeded(char2, 2)}`)
+
+    lines.push(miniDump(firstDeviationIdx, file1, file2))
+  }
+
+  return lines.join(EOL)
+}
