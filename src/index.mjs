@@ -1,5 +1,4 @@
-import { has, repeat, when } from '../node_modules/ramda/src/index.mjs'
-import { EOL } from 'os'
+import { has, repeat } from '../node_modules/ramda/src/index.mjs'
 
 const findIndexOfFirstDeviation = (buffer1, buffer2, skip) => {
   let idx = 0
@@ -26,11 +25,7 @@ const generateEllipsis = (firstDeviationIdx, file, bytes) => {
   return `${preEllipsis} ${stringifyBytes(bytes)} ${postEllipsis}`
 }
 
-const toHex = n => {
-  return '0x' + n.toString(16)
-}
-
-const miniDump = (firstDeviationIdx, file1, file2) => {
+export const miniDump = (firstDeviationIdx, file1, file2) => {
   let bytes1 = []
   let bytes2 = []
   let deviantByte1Idx = 0
@@ -57,28 +52,34 @@ const miniDump = (firstDeviationIdx, file1, file2) => {
   console.log(`           ${repeat('   ', deviantByte2Idx + 1).join('')}^^`)
 }
 
-export default (file1, file2, skip = 0, displayAsHex = false) => {
-  const toHexIfNeeded = when(() => displayAsHex, toHex)
-
-  console.log(EOL + 'length:')
-  if (file1.length === file2.length) {
-    console.log(`  the two files match, both are ${toHexIfNeeded(file1.length)} bytes`)
-  } else {
-    const sign = file2.length > file1.length ? '-' : '+'
-    const diff = Math.abs(file2.length - file1.length)
-    console.log(`  the two files differ: ${toHexIfNeeded(file1.length)} bytes <> ${toHexIfNeeded(file2.length)} bytes (${sign}${toHexIfNeeded(diff)})`)
+export default (file1, file2, skip = 0) => {
+  const result = {
+    size: {
+      equals: true
+    },
+    deviation: {
+      equals: true
+    }
   }
 
-  console.log(EOL + 'deviance:')
+  if (file1.length === file2.length) {
+    result.size.equals = true
+  } else {
+    result.size.equals = false
+    result.size.sign = file2.length > file1.length ? '-' : '+'
+    result.size.diff = Math.abs(file2.length - file1.length)
+  }
 
   const firstDeviationIdx = findIndexOfFirstDeviation(file1, file2, skip)
   if (firstDeviationIdx === -1) {
-    console.log('  the two files match')
+    result.deviation.equals = true
   } else {
-    const char1 = has(firstDeviationIdx, file1) ? toHexIfNeeded(file1[firstDeviationIdx]) : 'undefined'
-    const char2 = has(firstDeviationIdx, file2) ? toHexIfNeeded(file2[firstDeviationIdx]) : 'undefined'
-    console.log(`  the two files differ at ${toHexIfNeeded(firstDeviationIdx)}: ${char1} <> ${char2}`)
-
-    miniDump(firstDeviationIdx, file1, file2)
+    result.deviation.equals = false
+    result.deviation.char1 = has(firstDeviationIdx, file1) ? file1[firstDeviationIdx] : '?'
+    result.deviation.char2 = has(firstDeviationIdx, file2) ? file2[firstDeviationIdx] : '?'
+    result.deviation.firstDeviationIdx = firstDeviationIdx
   }
+
+  return result
 }
+
