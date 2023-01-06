@@ -9,14 +9,14 @@
   "scripts": {},
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/meszaros-lajos-gyorgy/binary-comparator.git"
+    "url": "git+https://github.com/arx-tools/binary-comparator.git"
   },
   "author": "Lajos Meszaros <m_lajos@hotmail.com>",
   "license": "GPL-3.0-or-later",
   "bugs": {
-    "url": "https://github.com/meszaros-lajos-gyorgy/binary-comparator/issues"
+    "url": "https://github.com/arx-tools/binary-comparator/issues"
   },
-  "homepage": "https://github.com/meszaros-lajos-gyorgy/binary-comparator#readme",
+  "homepage": "https://github.com/arx-tools/binary-comparator#readme",
   "dependencies": {
     "minimist": "^1.2.5",
     "ramda": "^0.27.1"
